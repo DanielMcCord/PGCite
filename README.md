@@ -1,5 +1,7 @@
-# PGCite
+# PGCite: Pretty Good/Potential Guacamole Citation Manager
 Citation manager using [Citation.js](https://citation.js.org/) and extra metadata from [Wikidata](https://www.wikidata.org/)
+
+Made for [BCHacks 2024](https://www.bchacks.dev/).
 
 ## License
 
