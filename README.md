@@ -1,5 +1,5 @@
 # PGCite
-Citation manager using [Citation.js](https://citation.js.org/) and [Wikidata](https://www.wikidata.org/)
+Citation manager using [Citation.js](https://citation.js.org/) and extra metadata from [Wikidata](https://www.wikidata.org/)
 
 ## License
 
