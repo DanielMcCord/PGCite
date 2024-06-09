@@ -8,6 +8,8 @@ function escapeSPARQL(str: string) {
 
 async function getAuthors(id: string) {
   const queryForAuthors = `
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
 SELECT ?id ?name ?description WHERE {
 SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
   VALUES ?name {
@@ -38,7 +40,7 @@ SELECT DISTINCT ?related ?relatedLabel WHERE {
 }
 ORDER BY (UCASE(?relatedLabel))`;
 
-  const query = queryForAuthorInfo;
+  const query = queryForAuthors;
 
   const queryEngine = new QueryEngine();
 
@@ -60,4 +62,4 @@ ORDER BY (UCASE(?relatedLabel))`;
 
 // const foo = await getAuthors("Douglas Adams");
 // getAuthors("Q19959618");
-getAuthors("Q8006577");
+getAuthors("Douglas Adams");
