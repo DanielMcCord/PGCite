@@ -9,33 +9,36 @@ async function getAuthors(name: string) {
     const apiRootUrl = "";
     const query = `
         PREFIX wikibase: <http://wikiba.se/ontology#>
+        PREFIX wd: <http://www.wikidata.org/entity/>
         PREFIX bd: <http://www.bigdata.com/rdf#>
         PREFIX p: <http://www.wikidata.org/prop/>
         PREFIX ps: <http://www.wikidata.org/prop/statement/>
-        SELECT DISTINCT ?item ?itemLabel WHERE {
-        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
-        {
-            SELECT DISTINCT ?item WHERE {
-                ?item p:P2093 ?statement0.
-                ?statement0 (ps:P2093) """${escapeForTurtle(name)}""".
-            }
-            LIMIT 100
-        }
-    }`;
+SELECT DISTINCT ?related ?relatedLabel WHERE {
+  VALUES ?target {
+    wd:Q19959618
+  }
+  { ?target ?prop ?related. }
+  UNION
+  { ?related ?prop ?target. }
+  FILTER(CONTAINS(STR(?related), "/entity/Q"))
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY (UCASE(?relatedLabel))`;
 
     const queryEngine = new QueryEngine();
     // const result = await queryEngine.query(query);
 
-    let bs = await queryEngine.queryBindings(query, { sources: ["https://query.wikidata.org/sparql"] });
-    let result = bs.on('data', (binding) => {
-    console.log(binding.toString()); // Quick way to print bindings for testing
-    
-    // // Obtaining values
-    // console.log(binding.get('item').value);
-    // console.log(binding.get('itemLabel').termType);
-    // console.log(binding.get('p').value);
-    // console.log(binding.get('statement0').value);
-})
+    let result = (await queryEngine.queryBindings(query, { sources: ["https://query.wikidata.org/sparql"] }))
+        .on('data', (binding) => {
+            console.log(binding.toString()); // Quick way to print bindings for testing
+
+            // // Obtaining values
+
+            // console.log(binding.get('item').value);
+            // console.log(binding.get('itemLabel').termType);
+            // console.log(binding.get('p').value);
+            // console.log(binding.get('statement0').value);
+        })
 
     // return result;
 }
