@@ -7,7 +7,20 @@ function escapeSPARQL(str: string) {
 }
 
 async function getAuthors(id: string) {
-  const query = `
+  const queryForAuthors = `
+SELECT ?id ?name ?description WHERE {
+SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  VALUES ?name {
+    "${id}"@en
+  }
+  ?id rdfs:label ?name;
+    schema:description ?description.
+  FILTER((LANG(?name)) = "en")
+  FILTER((LANG(?description)) = "en")
+}
+`;
+
+  const queryForAuthorInfo = `
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX bd: <http://www.bigdata.com/rdf#>
@@ -24,6 +37,8 @@ SELECT DISTINCT ?related ?relatedLabel WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 ORDER BY (UCASE(?relatedLabel))`;
+
+  const query = queryForAuthorInfo;
 
   const queryEngine = new QueryEngine();
 
