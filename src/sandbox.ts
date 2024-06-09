@@ -1,4 +1,4 @@
-import {} from "@citation-js/plugin-wikidata";
+import { } from "@citation-js/plugin-wikidata";
 import { QueryEngine } from "@comunica/query-sparql";
 
 // https://stackoverflow.com/questions/29601839/standard-regex-to-prevent-sparql-injection/55726984#55726984
