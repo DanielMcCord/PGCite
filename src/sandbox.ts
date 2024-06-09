@@ -1,5 +1,6 @@
 import { } from "@citation-js/plugin-wikidata";
 import { QueryEngine } from "@comunica/query-sparql";
+import { } from "readline"
 
 let authorDescriptions = []
 
@@ -50,9 +51,13 @@ ORDER BY (UCASE(?relatedLabel))`;
     await queryEngine.queryBindings(query, { sources: ["https://query.wikidata.org/sparql"] })
   ).on("data", (binding) => {
     // console.log(binding.toString()); // Quick way to print bindings for testing
-    authorDescriptions.push(binding.get("description").value);
+    authorDescriptions.push({
+      "id": binding.get("id").value,
+      "description": binding.get("description").value
+    });
   }).on("end", () => console.log(authorDescriptions));
 
 }
+
 
 getAuthors("Douglas Adams");
