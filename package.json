@@ -7,5 +7,10 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@citation-js/core": "^0.7.13",
+    "@citation-js/plugin-wikidata": "^0.7.13",
+    "@comunica/query-sparql": "^3.1.2"
   }
 }

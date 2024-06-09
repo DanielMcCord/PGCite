@@ -1,11 +1,10 @@
 import {} from "@citation-js/plugin-wikidata";
 import { QueryEngine } from "@comunica/query-sparql";
-// const SparqlParser = require('sparqljs').Parser;
 
 // https://stackoverflow.com/questions/29601839/standard-regex-to-prevent-sparql-injection/55726984#55726984
 const escapeForTurtle = (s: string) => s.replace(/(["'\\])/g, "\\$1");
 
-async function getAuthors(name: string) {
+async function getAuthors(id: string) {
   const apiRootUrl = "";
   const query = `
         PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -15,7 +14,7 @@ async function getAuthors(name: string) {
         PREFIX ps: <http://www.wikidata.org/prop/statement/>
 SELECT DISTINCT ?related ?relatedLabel WHERE {
   VALUES ?target {
-    wd:Q19959618
+    wd:${id}
   }
   { ?target ?prop ?related. }
   UNION
@@ -26,9 +25,8 @@ SELECT DISTINCT ?related ?relatedLabel WHERE {
 ORDER BY (UCASE(?relatedLabel))`;
 
   const queryEngine = new QueryEngine();
-  // const result = await queryEngine.query(query);
 
-  let result = (
+  const result = (
     await queryEngine.queryBindings(query, { sources: ["https://query.wikidata.org/sparql"] })
   ).on("data", (binding) => {
     console.log(binding.toString()); // Quick way to print bindings for testing
@@ -44,5 +42,6 @@ ORDER BY (UCASE(?relatedLabel))`;
   // return result;
 }
 
-let foo = await getAuthors("Douglas Adams");
-// console.log(foo)
+// const foo = await getAuthors("Douglas Adams");
+// getAuthors("Q19959618");
+getAuthors("Q8006577");
