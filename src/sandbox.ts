@@ -1,17 +1,18 @@
-import {} from "@citation-js/plugin-wikidata";
+import { } from "@citation-js/plugin-wikidata";
 import { QueryEngine } from "@comunica/query-sparql";
 
 // https://stackoverflow.com/questions/29601839/standard-regex-to-prevent-sparql-injection/55726984#55726984
-const escapeForTurtle = (s: string) => s.replace(/(["'\\])/g, "\\$1");
+function escapeSPARQL(str: string) {
+  str.replace(/(["'\\])/g, "\\$1");
+}
 
 async function getAuthors(id: string) {
-  const apiRootUrl = "";
   const query = `
-        PREFIX wikibase: <http://wikiba.se/ontology#>
-        PREFIX wd: <http://www.wikidata.org/entity/>
-        PREFIX bd: <http://www.bigdata.com/rdf#>
-        PREFIX p: <http://www.wikidata.org/prop/>
-        PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
 SELECT DISTINCT ?related ?relatedLabel WHERE {
   VALUES ?target {
     wd:${id}
