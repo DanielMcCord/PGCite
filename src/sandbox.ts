@@ -60,4 +60,40 @@ ORDER BY (UCASE(?relatedLabel))`;
 }
 
 
-getAuthors("Douglas Adams");
+async function getAuthorInfo(id: string) {
+
+const queryForAuthorInfo = `
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+SELECT DISTINCT ?related ?relatedLabel WHERE {
+  VALUES ?target {
+    wd:${id}
+  }
+  { ?target ?prop ?related. }
+  UNION
+  { ?related ?prop ?target. }
+  FILTER(CONTAINS(STR(?related), "/entity/Q"))
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY (UCASE(?relatedLabel))`;
+
+  const query = queryForAuthorInfo;
+
+  const queryEngine = new QueryEngine();
+
+  const result = (
+    await queryEngine.queryBindings(query, { sources: ["https://query.wikidata.org/sparql"] })
+  ).on("data", (binding) => {
+    console.log(binding.toString()); // Quick way to print bindings for testing
+  });
+
+}
+
+
+await getAuthors("William Carpenter");
+// await getAuthorInfo(authorDescriptions.filter(a => (a.description === "English author and humourist (1952–2001)"))[0])
+
+getAuthorInfo("Q8006577");
