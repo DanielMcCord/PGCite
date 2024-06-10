@@ -63,13 +63,12 @@ async function getAuthors(name: string) {
 }`;
 
   const result: Person[] = (await makeRequest(queryForAuthors)).map((binding) => {
-    const person = new Person(
+    return new Person(
+      // How to check that these values are not undefined (TS error 2532)?
       binding.get("name").value,
       binding.get("description").value,
       binding.get("id").value,
     );
-
-    return person;
   });
 
   return result;
@@ -102,13 +101,11 @@ SELECT DISTINCT ?related ?relatedLabel WHERE {
   FILTER(CONTAINS(STR(?related), "/entity/Q"))
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
-ORDER BY (UCASE(?relatedLabel))
-`;
+ORDER BY (UCASE(?relatedLabel))`;
 
+  // How to get all values of fields with multiple values (ex. multiple occupations)?
   const result: Field[] = (await makeRequest(query)).map((binding) => {
-    const field = new Field(binding.get("relatedLabel").value, binding.get("related").value);
-
-    return field;
+    return new Field(binding.get("relatedLabel").value, binding.get("related").value);
   });
 
   return result;
