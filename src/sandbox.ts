@@ -92,14 +92,17 @@ class Field {
 async function getAuthorInfo(id: string) {
   const query = `
 SELECT DISTINCT ?related ?relatedLabel WHERE {
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+
   VALUES ?target {
     wd:${escapeSPARQL(id)}
   }
+
   { ?target ?prop ?related. }
   UNION
   { ?related ?prop ?target. }
+
   FILTER(CONTAINS(STR(?related), "/entity/Q"))
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 ORDER BY (UCASE(?relatedLabel))`;
 
