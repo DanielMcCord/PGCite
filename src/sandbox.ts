@@ -26,7 +26,7 @@ ${query}`;
 
   return await bindingsStream
     .on("error", (error) => {
-      console.log(error);
+      console.error(error);
     })
     .toArray();
 }
