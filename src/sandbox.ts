@@ -18,6 +18,8 @@ PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
 ${query}`;
 
+  // console.log(queryWithPrefixes);
+
   const bindingsStream = await new QueryEngine().queryBindings(queryWithPrefixes, {
     sources: ["https://query.wikidata.org/sparql"],
   });
@@ -91,24 +93,30 @@ class Field {
 // Get information about a given author, using an exact ID (ex. Q42)
 async function getAuthorInfo(id: string) {
   const query = `
-SELECT DISTINCT ?related ?relatedLabel WHERE {
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-
+SELECT DISTINCT
+  ?propID     # Ex. P734
+  ?propLabel  # Ex. family name
+  ?value      # Ex. Q351735
+  ?valueLabel # Ex. Adams
+WHERE {
   VALUES ?target {
     wd:${escapeSPARQL(id)}
   }
 
-  { ?target ?prop ?related. }
-  UNION
-  { ?related ?prop ?target. }
+  ?target ?propID ?value.
 
-  FILTER(CONTAINS(STR(?related), "/entity/Q"))
+  ?prop wikibase:directClaim ?propID.
+
+  FILTER(CONTAINS(STR(?value), "/entity/Q")) # Filters results to only those with wikidata
+                                             # entries, ex. Q84 but not douglasadams
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-ORDER BY (UCASE(?relatedLabel))`;
+ORDER BY (UCASE(?propID))`;
 
   // How to get all values of fields with multiple values (ex. multiple occupations)?
   const result: Field[] = (await makeRequest(query)).map((binding) => {
-    return new Field(binding.get("relatedLabel").value, binding.get("related").value);
+    return new Field(binding.get("propLabel").value, binding.get("valueLabel").value);
   });
 
   return result;
