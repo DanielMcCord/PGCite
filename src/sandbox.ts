@@ -13,9 +13,10 @@ async function makeRequest(query: string) {
   const queryWithPrefixes = `
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX wd: <http://www.wikidata.org/entity/>
-PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX p: <http://www.wikidata.org/prop/>
 PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX bd: <http://www.bigdata.com/rdf#>
 ${query}`;
 
   // console.log(queryWithPrefixes);
@@ -59,11 +60,12 @@ WHERE {
     "${escapeSPARQL(name)}"@en
   }
 
-  ?id rdfs:label ?name;
-    schema:description ?description.
+  ?id wdt:P31 wd:Q5;                 # The ID of an instance of human,
+    rdfs:label ?name;                # ...whose entity label matches ?name,
+    schema:description ?description. # ...and get their single-sentence entity description
 
-  FILTER((LANG(?name)) = "en")
-  FILTER((LANG(?description)) = "en")
+  FILTER((LANG(?name)) = "en")        # Only names in English
+  FILTER((LANG(?description)) = "en") # Only descriptions in English
 }`;
 
   const result: Person[] = (await makeRequest(query)).map((binding) => {
@@ -95,7 +97,7 @@ class Field {
 }
 
 // Get information about a given author, using an exact ID (ex. Q42)
-// onlyWikidataEntities filters results to only those with Wikidata entries
+// onlyWikidataEntities filters results to only those with Wikidata entries (not literal values)
 async function getAuthorInfo(id: `Q${number}`, onlyWikidataEntities = true): Promise<Field[]> {
   const query = `
 SELECT DISTINCT
@@ -116,6 +118,7 @@ WHERE {
   # Ex. Q84 but not douglasadams
   ${onlyWikidataEntities ? "#" : ""} FILTER(CONTAINS(STR(?value), "/entity/Q"))
 
+  # Fetchs the label for every ?variable, the result of which is stored in ?variableLabel
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY (UCASE(?propID))`;
@@ -133,3 +136,4 @@ ORDER BY (UCASE(?propID))`;
 }
 
 console.log(await getAuthors("William Carpenter"), await getAuthorInfo("Q8006577"));
+// console.log(await getAuthors("Douglas Adams"));
