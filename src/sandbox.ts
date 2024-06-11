@@ -49,10 +49,12 @@ class Person {
 
 // Get a list of authors with an exact name (e.g. "Douglas Adams")
 async function getAuthors(name: string) {
-  const queryForAuthors = `
-  SELECT ?id ?name ?description WHERE {
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-
+  const query = `
+SELECT
+  ?id          # Ex. Q42
+  ?name        # Ex. Douglas Adams
+  ?description # Ex. English author and humourist (1952–2001)
+WHERE {
   VALUES ?name {
     "${escapeSPARQL(name)}"@en
   }
@@ -64,7 +66,7 @@ async function getAuthors(name: string) {
   FILTER((LANG(?description)) = "en")
 }`;
 
-  const result: Person[] = (await makeRequest(queryForAuthors)).map((binding) => {
+  const result: Person[] = (await makeRequest(query)).map((binding) => {
     const name: string | undefined = binding.get("name")?.value;
     const description: string | undefined = binding.get("description")?.value;
     const id: string | undefined = binding.get("id")?.value;
@@ -109,7 +111,7 @@ WHERE {
 
   ?prop wikibase:directClaim ?propID.
 
-  FILTER(CONTAINS(STR(?value), "/entity/Q")) # Filters results to only those with wikidata
+  FILTER(CONTAINS(STR(?value), "/entity/Q")) # Filters results to only those with Wikidata
                                              # entries, ex. Q84 but not douglasadams
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
