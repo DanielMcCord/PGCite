@@ -3,7 +3,7 @@ import { } from "@citation-js/plugin-wikidata";
 import { QueryEngine } from "@comunica/query-sparql";
 
 // https://stackoverflow.com/questions/29601839/standard-regex-to-prevent-sparql-injection/55726984#55726984
-function escapeSPARQL(str: string) {
+function escapeSPARQL(str: string): string {
   return str.replace(/(["'\\])/g, "\\$1");
 }
 
@@ -48,7 +48,7 @@ class Person {
 }
 
 // Get a list of authors with an exact name (e.g. "Douglas Adams")
-async function getAuthors(name: string) {
+async function getAuthors(name: string): Promise<Person[]> {
   const query = `
 SELECT
   ?id          # Ex. Q42
@@ -95,7 +95,8 @@ class Field {
 }
 
 // Get information about a given author, using an exact ID (ex. Q42)
-async function getAuthorInfo(id: string) {
+// onlyWikidataEntities filters results to only those with Wikidata entries
+async function getAuthorInfo(id: `Q${number}`, onlyWikidataEntities = true): Promise<Field[]> {
   const query = `
 SELECT DISTINCT
   ?propID     # Ex. P734
@@ -104,15 +105,16 @@ SELECT DISTINCT
   ?valueLabel # Ex. Adams
 WHERE {
   VALUES ?target {
-    wd:${escapeSPARQL(id)}
+    wd:${id}
   }
 
   ?target ?propID ?value.
 
   ?prop wikibase:directClaim ?propID.
 
-  FILTER(CONTAINS(STR(?value), "/entity/Q")) # Filters results to only those with Wikidata
-                                             # entries, ex. Q84 but not douglasadams
+  # Filters results to only those with Wikidata entries
+  # Ex. Q84 but not douglasadams
+  ${onlyWikidataEntities ? "#" : ""} FILTER(CONTAINS(STR(?value), "/entity/Q"))
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
