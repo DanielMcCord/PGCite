@@ -116,7 +116,6 @@ WHERE {
 }
 ORDER BY (UCASE(?propID))`;
 
-  // How to get all values of fields with multiple values (ex. multiple occupations)?
   const result: Field[] = (await makeRequest(query)).map((binding) => {
     const label: string | undefined = binding.get("propLabel")?.value;
     const value: string | undefined = binding.get("valueLabel")?.value;
