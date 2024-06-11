@@ -65,12 +65,14 @@ async function getAuthors(name: string) {
 }`;
 
   const result: Person[] = (await makeRequest(queryForAuthors)).map((binding) => {
-    return new Person(
-      // How to check that these values are not undefined (TS error 2532)?
-      binding.get("name").value,
-      binding.get("description").value,
-      binding.get("id").value,
-    );
+    const name: string | undefined = binding.get("name")?.value;
+    const description: string | undefined = binding.get("description")?.value;
+    const id: string | undefined = binding.get("id")?.value;
+
+    if (name === undefined || description === undefined || id === undefined)
+      throw new Error("Undefined trait in result!");
+
+    return new Person(name, description, id);
   });
 
   return result;
@@ -116,7 +118,12 @@ ORDER BY (UCASE(?propID))`;
 
   // How to get all values of fields with multiple values (ex. multiple occupations)?
   const result: Field[] = (await makeRequest(query)).map((binding) => {
-    return new Field(binding.get("propLabel").value, binding.get("valueLabel").value);
+    const label: string | undefined = binding.get("propLabel")?.value;
+    const value: string | undefined = binding.get("valueLabel")?.value;
+
+    if (label === undefined || value === undefined) throw new Error("Undefined trait in result!");
+
+    return new Field(label, value);
   });
 
   return result;
