@@ -35,14 +35,16 @@ ${query}`;
 }
 
 class Person {
-  name: string;
-  description: string;
-  id: string;
+  name: string; // Ex. Douglas Adams
+  description: string; // Ex. English author and humourist (1952–2001)
+  id: string; // Ex. https://www.wikidata.org/entity/Q42
+  idUrl: URL; // Ex. Q42
 
   constructor(name: string, description: string, id: string) {
     this.name = name;
     this.description = description;
-    this.id = id;
+    this.idUrl = new URL(id);
+    this.id = id.replace(/.*\/entity\//, "");
   }
 
   toString() {
@@ -85,12 +87,16 @@ WHERE {
 }
 
 class Field {
-  label: string;
-  value: string;
+  value: string; // Ex. novelist
+  label: string; // Ex. occupation
+  labelId: string; // Ex. P106
+  labelIdUrl: URL; // Ex. https://www.wikidata.org/prop/direct/P106
 
-  constructor(label: string, value: string) {
-    this.label = label;
+  constructor(labelId: string, label: string, value: string) {
     this.value = value;
+    this.label = label;
+    this.labelId = labelId.replace(/.*\/direct\//, "");
+    this.labelIdUrl = new URL(labelId);
   }
 
   toString() {
@@ -127,11 +133,13 @@ ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-
 
   const result: Field[] = (await makeRequest(query)).map((binding) => {
     const label: string | undefined = binding.get("propLabel")?.value;
+    const labelId: string | undefined = binding.get("propID")?.value;
     const value: string | undefined = binding.get("valueLabel")?.value;
 
-    if (label === undefined || value === undefined) throw new Error("Undefined trait in result!");
+    if (label === undefined || labelId === undefined || value === undefined)
+      throw new Error("Undefined trait in result!");
 
-    return new Field(label, value);
+    return new Field(labelId, label, value);
   });
 
   return result;
@@ -139,3 +147,4 @@ ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-
 
 console.log(await getAuthors("William Carpenter"), await getAuthorInfo("Q8006577"));
 // console.log(await getAuthors("Douglas Adams"));
+// console.log(await getAuthorInfo("Q42"));
