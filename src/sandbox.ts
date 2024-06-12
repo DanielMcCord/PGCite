@@ -1,3 +1,5 @@
+#! /usr/bin/env -S bun run
+
 import { } from "node:readline";
 import { } from "@citation-js/plugin-wikidata";
 import { QueryEngine } from "@comunica/query-sparql";
@@ -121,7 +123,7 @@ WHERE {
   # Fetchs the label for every ?variable, the result of which is stored in ?variableLabel
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-ORDER BY (UCASE(?propID))`;
+ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-padded`;
 
   const result: Field[] = (await makeRequest(query)).map((binding) => {
     const label: string | undefined = binding.get("propLabel")?.value;
