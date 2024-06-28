@@ -138,7 +138,7 @@ ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-
 function getValues(bindings: Bindings, ...names: string[]) {
   return names.map((name: string) => {
     const value = bindings.get(name)?.value;
-    if (value === undefined) throw new Error("Undefined trait in result!");
+    if (value === undefined) throw new Error(`Binding '${name}' is undefined!`);
     return value;
   });
 }
