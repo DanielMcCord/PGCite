@@ -1,8 +1,9 @@
 #! /usr/bin/env -S bun run
 
-import { } from "node:readline";
-import { } from "@citation-js/plugin-wikidata";
+import {} from "node:readline";
+import {} from "@citation-js/plugin-wikidata";
 import { QueryEngine } from "@comunica/query-sparql";
+import type { Bindings } from "@rdfjs/types";
 
 // https://stackoverflow.com/questions/29601839/standard-regex-to-prevent-sparql-injection/55726984#55726984
 function escapeSPARQL(str: string): string {
@@ -72,15 +73,9 @@ WHERE {
   FILTER((LANG(?description)) = "en") # Only descriptions in English
 }`;
 
-  const result: Person[] = (await makeRequest(query)).map((binding) => {
-    const name: string | undefined = binding.get("name")?.value;
-    const description: string | undefined = binding.get("description")?.value;
-    const id: string | undefined = binding.get("id")?.value;
-
-    if (name === undefined || description === undefined || id === undefined)
-      throw new Error("Undefined trait in result!");
-
-    return new Person(name, description, id);
+  const result: Person[] = (await makeRequest(query)).map((bindings) => {
+    const values: string[] = getValues(bindings, "name", "description", "id");
+    return new Person(...(values as [string, string, string]));
   });
 
   return result;
@@ -131,18 +126,21 @@ WHERE {
 }
 ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-padded`;
 
-  const result: Field[] = (await makeRequest(query)).map((binding) => {
-    const label: string | undefined = binding.get("propLabel")?.value;
-    const labelId: string | undefined = binding.get("propID")?.value;
-    const value: string | undefined = binding.get("valueLabel")?.value;
-
-    if (label === undefined || labelId === undefined || value === undefined)
-      throw new Error("Undefined trait in result!");
-
-    return new Field(labelId, label, value);
+  const result: Field[] = (await makeRequest(query)).map((bindings) => {
+    const values: string[] = getValues(bindings, "propID", "propLabel", "valueLabel");
+    return new Field(...(values as [string, string, string]));
   });
 
   return result;
+}
+
+// Get a list of values for the given binding names
+function getValues(bindings: Bindings, ...names: string[]) {
+  return names.map((name: string) => {
+    const value = bindings.get(name)?.value;
+    if (value === undefined) throw new Error("Undefined trait in result!");
+    return value;
+  });
 }
 
 console.log(await getAuthors("William Carpenter"), await getAuthorInfo("Q8006577"));
