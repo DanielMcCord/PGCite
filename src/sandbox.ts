@@ -62,7 +62,7 @@ SELECT
   ?description # Ex. English author and humourist (1952–2001)
 WHERE {
   VALUES ?name {
-    "${escapeSPARQL(name)}"@en
+    """${escapeSPARQL(name)}"""@en
   }
 
   ?id wdt:P31 wd:Q5;                 # The ID of an instance of human,
