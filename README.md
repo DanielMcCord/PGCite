@@ -1,11 +1,10 @@
-# PGCite: Pretty Good/Potential Guacamole Citation Manager
-Citation manager using [Citation.js](https://citation.js.org/) and extra metadata from [Wikidata](https://www.wikidata.org/)
+# PGCite: Pretty Good Citations
+Citation manager using ~~Citation.js~~*library TBD* and extra metadata from [Wikidata](https://www.wikidata.org/).
 
-Made for [BCHacks 2024](https://www.bchacks.dev/).
-
+Originally written in TypeScript for [BCHacks 2024](https://www.bchacks.dev/). Rewritten in Rust.
 ## License
 
-Copyright © 2024 Daniel McCord, Connor Curnow, Roland Regus, and Mariya Mokrynska
+Copyright © 2024 Daniel McCord, Connor Curnow, Roland Regus, and Mariya Mokrynska.
 
 PGCite is licensed under the GNU Affero General Public License version 3, or (at your option) any later version. You should have received a copy of the GNU Affero General Public License along with PGCite, found in [LICENSE](./LICENSE). If not, see <[https://www.gnu.org/licenses/](https://www.gnu.org/licenses/)>.
 
