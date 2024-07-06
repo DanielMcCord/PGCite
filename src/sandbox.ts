@@ -22,8 +22,6 @@ PREFIX ps: <http://www.wikidata.org/prop/statement/>
 PREFIX bd: <http://www.bigdata.com/rdf#>
 ${query}`;
 
-  // console.log(queryWithPrefixes);
-
   const bindingsStream = await new QueryEngine().queryBindings(queryWithPrefixes, {
     sources: ["https://query.wikidata.org/sparql"],
   });
@@ -158,6 +156,3 @@ console.log();
 for (const field of await getAuthorInfo("Q8006577")) {
   console.log(field.toString());
 }
-
-// console.log(await getAuthors("Douglas Adams"));
-// console.log(await getAuthorInfo("Q42"));
