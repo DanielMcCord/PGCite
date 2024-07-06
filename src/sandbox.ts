@@ -5,13 +5,17 @@ import {} from "@citation-js/plugin-wikidata";
 import { QueryEngine } from "@comunica/query-sparql";
 import type { Bindings } from "@rdfjs/types";
 
-// https://stackoverflow.com/questions/29601839/standard-regex-to-prevent-sparql-injection/55726984#55726984
+/**
+ * https://stackoverflow.com/questions/29601839/standard-regex-to-prevent-sparql-injection/55726984#55726984
+ */
 function escapeSparql(str: string): string {
   return str.replace(/(["'\\])/g, "\\$1");
 }
 
-// Make a request to the Wikidata SPARQL API, using a given SPARQL query (as it would be entered in https://query.wikidata.org/)
-// Returns an array of bindings (https://comunica.dev/docs/query/getting_started/query_app/#3-3-consuming-binding-results-as-an-array)
+/**
+ * Make a request to the Wikidata SPARQL API, using a given SPARQL query (as it would be entered in https://query.wikidata.org/)
+ * @returns an array of bindings (https://comunica.dev/docs/query/getting_started/query_app/#3-3-consuming-binding-results-as-an-array)
+ */
 async function makeRequest(query: string) {
   const queryWithPrefixes = `
 PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -34,10 +38,14 @@ ${query}`;
 }
 
 class Person {
-  name: string; // Ex. Douglas Adams
-  description: string; // Ex. English author and humourist (1952–2001)
-  id: string; // Ex. Q42
-  idUrl: URL; // Ex. https://www.wikidata.org/entity/Q42
+  /** Ex. Douglas Adams */
+  name: string;
+  /** Ex. English author and humourist (1952–2001) */
+  description: string;
+  /** Ex. Q42 */
+  id: string;
+  /** Ex. https://www.wikidata.org/entity/Q42 */
+  idUrl: URL;
 
   constructor(name: string, description: string, id: string) {
     this.name = name;
@@ -51,7 +59,9 @@ class Person {
   }
 }
 
-// Get a list of authors with an exact name (e.g. "Douglas Adams")
+/**
+ * Get a list of authors with an exact name (e.g. "Douglas Adams")
+ */
 async function getAuthors(name: string): Promise<Person[]> {
   const query = `
 SELECT
@@ -80,10 +90,14 @@ WHERE {
 }
 
 class Field {
-  value: string; // Ex. novelist
-  label: string; // Ex. occupation
-  labelId: string; // Ex. P106
-  labelIdUrl: URL; // Ex. https://www.wikidata.org/prop/direct/P106
+  /** Ex. novelist */
+  value: string;
+  /** Ex. occupation */
+  label: string;
+  /** Ex. P106 */
+  labelId: string;
+  /** Ex. https://www.wikidata.org/prop/direct/P106 */
+  labelIdUrl: URL;
 
   constructor(labelId: string, label: string, value: string) {
     this.value = value;
@@ -95,15 +109,18 @@ class Field {
   toString() {
     return `${this.label}: ${this.value}`;
   }
-}
-
-function getLastSegment(url:URL) {
+}/**
+ * Get the last part of the path of a URL
+ */
+function getLastSegment(url: URL) {
   const segments = url.pathname.split("/");
   return segments[segments.length - 1];
 }
 
-// Get information about a given author, using an exact ID (ex. Q42)
-// onlyWikidataEntities filters results to only those with Wikidata entries (not literal values)
+/**
+ * Get information about a given author, using an exact ID (ex. Q42)
+ * onlyWikidataEntities filters results to only those with Wikidata entries (not literal values)
+ */
 async function getAuthorInfo(id: `Q${number}`, onlyWikidataEntities = true): Promise<Field[]> {
   const query = `
 SELECT DISTINCT
@@ -137,7 +154,9 @@ ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-
   return result;
 }
 
-// Get a list of values for the given binding names
+/**
+ * Get a list of values for the given binding names
+ */
 function getValues(bindings: Bindings, ...names: string[]) {
   return names.map((name: string) => {
     const value = bindings.get(name)?.value;
