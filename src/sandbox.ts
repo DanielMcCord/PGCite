@@ -45,7 +45,7 @@ class Person {
     this.name = name;
     this.description = description;
     this.idUrl = new URL(id);
-    this.id = id.replace(/.*\/entity\//, "");
+    this.id = getLastSegment(this.idUrl);
   }
 
   toString() {
@@ -90,13 +90,18 @@ class Field {
   constructor(labelId: string, label: string, value: string) {
     this.value = value;
     this.label = label;
-    this.labelId = labelId.replace(/.*\/direct\//, "");
     this.labelIdUrl = new URL(labelId);
+    this.labelId = getLastSegment(this.labelIdUrl);
   }
 
   toString() {
     return `${this.label}: ${this.value}`;
   }
+}
+
+function getLastSegment(url:URL) {
+  const segments = url.pathname.split("/");
+  return segments[segments.length - 1];
 }
 
 // Get information about a given author, using an exact ID (ex. Q42)
