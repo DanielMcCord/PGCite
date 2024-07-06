@@ -38,8 +38,8 @@ ${query}`;
 class Person {
   name: string; // Ex. Douglas Adams
   description: string; // Ex. English author and humourist (1952–2001)
-  id: string; // Ex. https://www.wikidata.org/entity/Q42
-  idUrl: URL; // Ex. Q42
+  id: string; // Ex. Q42
+  idUrl: URL; // Ex. https://www.wikidata.org/entity/Q42
 
   constructor(name: string, description: string, id: string) {
     this.name = name;
