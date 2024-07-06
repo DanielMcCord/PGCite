@@ -143,6 +143,16 @@ function getValues(bindings: Bindings, ...names: string[]) {
   });
 }
 
-console.log(await getAuthors("William Carpenter"), await getAuthorInfo("Q8006577"));
+const authors = await getAuthors("William Carpenter");
+for (const author of authors) {
+  console.log(author.toString());
+}
+
+console.log();
+
+for (const field of await getAuthorInfo("Q8006577")) {
+  console.log(field.toString());
+}
+
 // console.log(await getAuthors("Douglas Adams"));
 // console.log(await getAuthorInfo("Q42"));
