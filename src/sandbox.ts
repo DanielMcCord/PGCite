@@ -6,11 +6,11 @@ import { QueryEngine } from "@comunica/query-sparql";
 import type { Bindings } from "@rdfjs/types";
 
 // https://stackoverflow.com/questions/29601839/standard-regex-to-prevent-sparql-injection/55726984#55726984
-function escapeSPARQL(str: string): string {
+function escapeSparql(str: string): string {
   return str.replace(/(["'\\])/g, "\\$1");
 }
 
-// Make a request to the Wikidata SPAQL API, using a given SPARQL query (as it would be entered in https://query.wikidata.org/)
+// Make a request to the Wikidata SPARQL API, using a given SPARQL query (as it would be entered in https://query.wikidata.org/)
 // Returns an array of bindings (https://comunica.dev/docs/query/getting_started/query_app/#3-3-consuming-binding-results-as-an-array)
 async function makeRequest(query: string) {
   const queryWithPrefixes = `
@@ -62,7 +62,7 @@ SELECT
   ?description # Ex. English author and humourist (1952–2001)
 WHERE {
   VALUES ?name {
-    """${escapeSPARQL(name)}"""@en
+    """${escapeSparql(name)}"""@en
   }
 
   ?id wdt:P31 wd:Q5;                 # The ID of an instance of human,
@@ -126,7 +126,7 @@ WHERE {
   # Ex. Q84 but not douglasadams
   ${onlyWikidataEntities ? "#" : ""} FILTER(CONTAINS(STR(?value), "/entity/Q"))
 
-  # Fetchs the label for every ?variable, the result of which is stored in ?variableLabel
+  # Fetches the label for every ?variable, the result of which is stored in ?variableLabel
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-padded`;
