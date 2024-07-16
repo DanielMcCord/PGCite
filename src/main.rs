@@ -18,7 +18,7 @@ fn escape_sparql(str: &str) -> Cow<str> {
 }
 
 /// Makes a request to the Wikidata SPARQL API, using a given SPARQL query (as it would be entered in https://query.wikidata.org/).
-async fn make_request(query: &str) -> Vec<Value> {
+async fn make_request(query: &str) -> Option<Vec<Value>> {
   let query_with_prefixes = format!(
     "
 PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -30,21 +30,19 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 {query}"
   );
 
-  Api::new("https://www.wikidata.org/w/api.php")
-    .await
-    .unwrap()
-    .sparql_query(&query_with_prefixes)
-    .await
-    .unwrap()
-    .as_object()
-    .unwrap()
-    .get("results")
-    .unwrap()
-    .get("bindings")
-    .unwrap()
-    .as_array()
-    .unwrap()
-    .clone()
+  Some(
+    Api::new("https://www.wikidata.org/w/api.php")
+      .await
+      .ok()?
+      .sparql_query(&query_with_prefixes)
+      .await
+      .ok()?
+      .as_object()?
+      .get("results")?
+      .get("bindings")?
+      .as_array()?
+      .clone(),
+  )
 }
 
 struct Person {
@@ -101,6 +99,7 @@ WHERE {{
 
   make_request(&query)
     .await
+    .unwrap()
     .iter()
     .map(|v| {
       let [name, description, id_url] = get_values(v, ["name", "description", "id"]);
@@ -184,6 +183,7 @@ ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-
 
   make_request(&query)
     .await
+    .unwrap()
     .iter()
     .map(|v| {
       let [label_id, label, value] = get_values(v, ["propID", "propLabel", "valueLabel"]);
