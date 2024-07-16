@@ -17,7 +17,7 @@ fn escape_sparql(str: &str) -> Cow<str> {
   SPARQL_METACHARACTERS.replace_all(str, r"\$1")
 }
 
-/// Make a request to the Wikidata SPARQL API, using a given SPARQL query (as it would be entered in https://query.wikidata.org/)
+/// Makes a request to the Wikidata SPARQL API, using a given SPARQL query (as it would be entered in https://query.wikidata.org/).
 async fn make_request(query: &str) -> Vec<Value> {
   let query_with_prefixes = format!(
     "
@@ -75,6 +75,7 @@ impl Debug for Person {
   }
 }
 
+/// Returns the people on Wikidata with a specific name.
 async fn get_authors(name: &str) -> Vec<Person> {
   let query = format!(
     "
@@ -137,7 +138,7 @@ impl Debug for Field {
   }
 }
 
-/// Get the last part of the path of a URL
+/// Gets the last part of the path of a URL.
 fn get_last_segment(url: &Url) -> String {
   url.path_segments().and_then(|s| s.last()).unwrap().into()
 }
@@ -150,8 +151,8 @@ impl Display for Q<'_> {
   }
 }
 
-/// Get information about a given author, using an exact ID (ex. Q42)
-/// onlyWikidataEntities filters results to only those with Wikidata entries (not literal values)
+/// Gets information about a given author, using an exact ID (ex. Q42).
+/// onlyWikidataEntities filters results to only those with Wikidata entries (not literal values).
 #[nade]
 async fn get_author_info(id: Q<'_>, #[nade(true)] only_wikidata_entities: bool) -> Vec<Field> {
   let query = format!(
@@ -191,7 +192,7 @@ ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-
     .collect()
 }
 
-/// Get a list of values for the given binding names
+/// Gets a list of values for the given binding names.
 fn get_values<'a, const N: usize>(obj: &'a Value, names: [&str; N]) -> [&'a str; N] {
   names.map(|name| {
     obj
