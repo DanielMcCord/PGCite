@@ -79,7 +79,7 @@ impl Debug for Person {
 }
 
 /// Returns the people on Wikidata with a specific name.
-async fn get_authors(name: &str) -> Vec<Person> {
+async fn get_authors(name: &str) -> Option<Vec<Person>> {
   let query = format!(
     "
 SELECT
@@ -103,12 +103,11 @@ WHERE {{
   );
 
   make_request(&query)
-    .await
-    .unwrap()
+    .await?
     .iter()
     .map(|v| {
       let [name, description, id_url] = get_values(v, ["name", "description", "id"]);
-      Person::new(name, description, Url::parse(id_url).unwrap()).unwrap()
+      Person::new(name, description, Url::parse(id_url).ok()?).ok()
     })
     .collect()
 }
@@ -158,7 +157,10 @@ impl Display for Q<'_> {
 /// Gets information about a given author, using an exact ID (ex. Q42).
 /// onlyWikidataEntities filters results to only those with Wikidata entries (not literal values).
 #[nade]
-async fn get_author_info(id: Q<'_>, #[nade(true)] only_wikidata_entities: bool) -> Vec<Field> {
+async fn get_author_info(
+  id: Q<'_>,
+  #[nade(true)] only_wikidata_entities: bool,
+) -> Option<Vec<Field>> {
   let query = format!(
     "
 SELECT DISTINCT
@@ -187,12 +189,11 @@ ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-
   );
 
   make_request(&query)
-    .await
-    .unwrap()
+    .await?
     .iter()
     .map(|v| {
       let [label_id, label, value] = get_values(v, ["propID", "propLabel", "valueLabel"]);
-      Field::new(label_id, label, value).unwrap()
+      Field::new(label_id, label, value).ok()
     })
     .collect()
 }
@@ -211,14 +212,14 @@ fn get_value<'a>(obj: &'a Value, name: &str) -> Option<&'a str> {
 
 #[tokio::main]
 async fn main() {
-  let authors = get_authors("William Carpenter").await;
+  let authors = get_authors("William Carpenter").await.unwrap();
   for author in authors {
     println!("{author:?}");
   }
 
   println!();
 
-  for field in get_author_info!(Q("8006577")).await {
+  for field in get_author_info!(Q("8006577")).await.unwrap() {
     println!("{field:?}");
   }
 }
