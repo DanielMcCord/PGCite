@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::fmt::{Debug, Display, Formatter};
 
 use lazy_static::lazy_static;
-use mediawiki::Api;
+use mediawiki::{Api, MediaWikiError};
 use nade::base::nade_helper;
 use nade::nade;
 use regex::Regex;
@@ -19,6 +19,20 @@ fn escape_sparql(str: &str) -> Cow<str> {
 
 /// Makes a request to the Wikidata SPARQL API, using a given SPARQL query (as it would be entered in https://query.wikidata.org/).
 async fn make_request(query: &str) -> Option<Vec<Value>> {
+  Some(
+    query_wikidata(query)
+      .await
+      .ok()?
+      .as_object()?
+      .get("results")?
+      .get("bindings")?
+      .as_array()?
+      .to_owned(),
+  )
+}
+
+/// Performs the actual query to Wikidata and `await`s the response.
+async fn query_wikidata(query: &str) -> Result<Value, MediaWikiError> {
   let query_with_prefixes = format!(
     "
 PREFIX wikibase: <http://wikiba.se/ontology#>
@@ -30,19 +44,10 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
 {query}"
   );
 
-  Some(
-    Api::new("https://www.wikidata.org/w/api.php")
-      .await
-      .ok()?
-      .sparql_query(&query_with_prefixes)
-      .await
-      .ok()?
-      .as_object()?
-      .get("results")?
-      .get("bindings")?
-      .as_array()?
-      .to_owned(),
-  )
+  Api::new("https://www.wikidata.org/w/api.php")
+    .await?
+    .sparql_query(&query_with_prefixes)
+    .await
 }
 
 struct Person {
