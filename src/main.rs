@@ -41,7 +41,7 @@ PREFIX bd: <http://www.bigdata.com/rdf#>
       .get("results")?
       .get("bindings")?
       .as_array()?
-      .clone(),
+      .to_owned(),
   )
 }
 
