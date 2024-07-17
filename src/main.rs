@@ -200,16 +200,13 @@ ORDER BY DESC(?propID) # Doesn't actually sort correctly because props aren't 0-
 /// Gets a list of values for the given binding names.
 fn get_values<'a, const N: usize>(obj: &'a Value, names: [&str; N]) -> [&'a str; N] {
   names.map(|name| {
-    obj
-      .as_object()
-      .unwrap()
-      .get(name)
-      .unwrap()
-      .get("value")
-      .unwrap()
-      .as_str()
-      .unwrap()
+    get_value(obj, name).unwrap_or_else(|| panic!("Attribute '{name}' not found in {obj}"))
   })
+}
+
+/// Gets the value for the given binding name if it exists.
+fn get_value<'a>(obj: &'a Value, name: &str) -> Option<&'a str> {
+  obj.as_object()?.get(name)?.get("value")?.as_str()
 }
 
 #[tokio::main]
