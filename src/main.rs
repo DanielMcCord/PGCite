@@ -3,8 +3,6 @@ use std::fmt::{Debug, Display, Formatter};
 
 use lazy_static::lazy_static;
 use mediawiki::{Api, MediaWikiError};
-use nade::base::nade_helper;
-use nade::nade;
 use regex::Regex;
 use serde_json::value::Value;
 use url::{ParseError, Url};
@@ -155,12 +153,9 @@ impl Display for Q<'_> {
 }
 
 /// Gets information about a given author, using an exact ID (ex. Q42).
-/// onlyWikidataEntities filters results to only those with Wikidata entries (not literal values).
-#[nade]
-async fn get_author_info(
-  id: Q<'_>,
-  #[nade(true)] only_wikidata_entities: bool,
-) -> Option<Vec<Field>> {
+/// onlyWikidataEntities (true by default) filters results to only those with Wikidata entries (not literal values).
+async fn get_author_info(id: Q<'_>, only_wikidata_entities: Option<bool>) -> Option<Vec<Field>> {
+  let only_wikidata_entities = only_wikidata_entities.unwrap_or(true);
   let query = format!(
     "
 SELECT DISTINCT
@@ -219,7 +214,7 @@ async fn main() {
 
   println!();
 
-  for field in get_author_info!(Q("8006577")).await.unwrap() {
+  for field in get_author_info(Q("8006577"), None).await.unwrap() {
     println!("{field:?}");
   }
 }

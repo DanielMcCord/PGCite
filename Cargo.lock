@@ -8,7 +8,6 @@ version = "0.1.0"
 dependencies = [
  "lazy_static",
  "mediawiki",
- "nade",
  "regex",
  "serde_json",
  "tokio",
@@ -717,17 +716,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 
 [[package]]
-name = "macro-v"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f91288a9fb9f1062be55dbae2d0f37979a26435910c5e067ae6cf0c252f7644a"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "mediawiki"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -785,28 +773,6 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "nade"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0cd51a2fe92aa4808775341301a92cbf33f7cddc09d8666379e5fb1e222ff98"
-dependencies = [
- "macro-v",
- "nade-macro",
-]
-
-[[package]]
-name = "nade-macro"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e11e424af952d4019789dadaf462e9444b9d7e5030e818e48c394c9e0caf0325"
-dependencies = [
- "prettyplease",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -1068,16 +1034,6 @@ name = "ppv-lite86"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
-
-[[package]]
-name = "prettyplease"
-version = "0.2.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5f12335488a2f3b0a83b14edad48dca9879ce89b2edd10e80237e4e852dd645e"
-dependencies = [
- "proc-macro2",
- "syn",
-]
 
 [[package]]
 name = "proc-macro2"
